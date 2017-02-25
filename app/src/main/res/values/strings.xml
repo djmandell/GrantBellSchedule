@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Grant Bell Schedule</string>
+    <string name="network_unavailable_message">Network is unavailable</string>
+    <string name="no_school">NO SCHOOL</string>
+	<string name="action_settings">Settings</string>
+</resources>
