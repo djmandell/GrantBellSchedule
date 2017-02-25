@@ -488,9 +488,7 @@ public class MainActivity extends AppCompatActivity {
         else{
             //Log.i(TAG,"Looks like we've already checked today and it's after 8:15a ===========> ");
         }
-
-
-
+        
         //!! Log.i(TAG,"WE'RE RUNNING AFTER SHAREDPREFS GET LOADED ===========> ");
         //updateDisplay();
 
