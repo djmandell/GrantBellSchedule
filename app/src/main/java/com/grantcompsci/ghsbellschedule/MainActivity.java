@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private SimpleDateFormat mYearMonthDayFormatter =  new SimpleDateFormat("yyyyMMdd");
 
 
-    
+
     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
 
     @Override
@@ -592,7 +592,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(!matchFound){
-            scheduleType.setScheduleType(getString(R.string.no_school));
+            if (mSelectedDateTime.getWeekDay() == 7 || mSelectedDateTime.getWeekDay() == 1 ){
+                scheduleType.setScheduleType("WEEKEND");
+            }
+            else{
+                scheduleType.setScheduleType(getString(R.string.no_school));
+            }
+
         }
 
 
