@@ -13,7 +13,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+//import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                     dateTime = dateTime.plusDays(dateOffset);
                 }
                 //!! Log.i(TAG,"SCROLLED AND SET DATE ===========>  new date: "+ dateTime.format("D MMMM YYYY", Locale.US));
-                setSubtitle(dateTime.format("D MMMM YYYY", Locale.US));
+                setSubtitle(dateTime.format("WWWW, D MMMM YYYY", Locale.US));
                 mScrolled = true;
             }
         });
@@ -245,7 +245,8 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     protected void onResume() {
-
+        isExpanded = false;
+        mAppBarLayout.setExpanded(false, true);
         super.onResume();
         setTodayDate(new Date());
         setSelectedDate(new Date());
@@ -261,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setSelectedDate(Date date) {
-        setSubtitle(new SimpleDateFormat("d MMMM yyyy", /*Locale.getDefault()*/Locale.ENGLISH).format(date));
+        setSubtitle(new SimpleDateFormat("EEEE, d MMMM yyyy", /*Locale.getDefault()*/Locale.ENGLISH).format(date));
         if (mCompactCalendarView != null) {
             mCompactCalendarView.setCurrentDate(date);
 
@@ -488,7 +489,7 @@ public class MainActivity extends AppCompatActivity {
         else{
             //Log.i(TAG,"Looks like we've already checked today and it's after 8:15a ===========> ");
         }
-        
+
         //!! Log.i(TAG,"WE'RE RUNNING AFTER SHAREDPREFS GET LOADED ===========> ");
         //updateDisplay();
 
@@ -570,7 +571,10 @@ public class MainActivity extends AppCompatActivity {
                 scheduleType.setScheduleType(calendarScheduleDayObject.getString("SUMMARY"));
                 matchFound = true;
             }
-            if (calendarScheduleDayObject.getString("SUMMARY").equals("NO SCHOOL") || calendarScheduleDayObject.getString("SUMMARY").equals("CONFERENCES")){
+            if (calendarScheduleDayObject.getString("SUMMARY").equals("NO SCHOOL")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("CONFERENCES")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("SPRING BREAK")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("WINTER BREAK")){
                 Date eventDate = new Date();
                 String eventDateString = calendarScheduleDayObject.getString("DTSTART;VALUE=DATE");
                 try {
