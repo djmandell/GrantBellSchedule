@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private SimpleDateFormat mYearMonthDayFormatter =  new SimpleDateFormat("yyyyMMdd");
 
 
+    
     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
 
     @Override
