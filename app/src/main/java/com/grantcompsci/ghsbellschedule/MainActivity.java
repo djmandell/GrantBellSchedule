@@ -13,8 +13,11 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-//import android.util.Log;
+import android.util.Log;
+import android.view.Display;
+import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -56,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
     */
 
     private static final String PREFS_FILE = "com.grantcompsci.ghsbellschedule";
+
+
+
     private static final String KEY_JSONSCHEDULEDATA = "key_jsonscheduldata";
     private static final String KEY_JSONPERIODSCHEDULEDATA = "key_jsonperiodscheduldata";
     private static final String KEY_DATEVERSIONCHECK = "key_dateversioncheck";
@@ -68,10 +74,11 @@ public class MainActivity extends AppCompatActivity {
     private Period [] mPeriods;
     private DividerItemDecoration mDividerItemDecoration;
     private String mJsonScheduleData;
-    private String mJsonPeriodScheduleData;
+    //private String mJsonPeriodScheduleData;
     //Calendar mCalendar = Calendar.getInstance();
     private Date mTodayDate;
-    //private DateTime mTodayDateTime;
+    private Date mSavedDate;
+    private DateTime mCurrentDateTime;
     //private String mTodayDateString;
     private int mTodayDateInt;
     private CompactCalendarView mCompactCalendarView;
@@ -87,7 +94,57 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    static final String SAVED_DATE_STRING = "saved_date_string";
+    static final String SELECTED_DATE_INT_KEY = "selected_date_int_key";
+    static final String SELECTED_DATE_STRING_KEY = "selected_date_string_key";
+    //static final String ROTATED_KEY = "rotated_key";
+    //static final String ROTATION_KEY = "rotation_key";
     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+
+
+
+    // Track date when we save the instance.  If it's been less than... 3 minutes we'll assume they want same date
+    // Dump rotation detection, it doesn't work perfectly and this covers rotation
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save custom values into the bundle
+
+        savedInstanceState.putString(SAVED_DATE_STRING, new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
+        savedInstanceState.putInt(SELECTED_DATE_INT_KEY, mSelectedDateInt);
+        savedInstanceState.putString(SELECTED_DATE_STRING_KEY, mSelectedDateString);
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+        System.out.println();
+
+
+    }
+
+
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Always call the superclass so it can restore the view hierarchy
+        super.onRestoreInstanceState(savedInstanceState);
+        // Restore state members from saved instance
+
+        mSelectedDateInt = savedInstanceState.getInt(SELECTED_DATE_INT_KEY);
+        mSelectedDateString = savedInstanceState.getString(SELECTED_DATE_STRING_KEY);
+        Date savedDate = new Date();
+        // convert from String to Date
+        try {
+            mSavedDate = new SimpleDateFormat("yyyyMMddHHmmss").parse(savedInstanceState.getString(SAVED_DATE_STRING));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mSavedDate = new Date();
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
                    -if we're scrolling to February when the date is the 29th or 30th we'll automatically select the 28th (or 29th on a leap year)
                 */
                 DateTime dateTime = new DateTime(new SimpleDateFormat("yyyy-MM-dd").format(firstDayOfNewMonth));
+
                 int dateOffset = ((int) mSelectedDateTime.getDay())-1;
                 //Log.i(TAG,"SCROLLED ===========> dateTime = " + dateTime.getMonth());
 
@@ -237,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
 
     onResume we now:
         1) Get current date and time (should be ints?)
-        2) Check to see if we've ever done a version check, our version check was before today, or it's befor 8:15am
+        2) Check to see if we've ever done a version check, our version check was before today, or it's before 8:15am
             I assume snow days/late start announced before 8:15, so we want to check for new versions whenever app is loaded before that time
         3) Check for network availability
         4) If network available, download version JSON
@@ -249,8 +307,41 @@ public class MainActivity extends AppCompatActivity {
         isExpanded = false;
         mAppBarLayout.setExpanded(false, true);
         super.onResume();
+
+
+
+        Display display = ((WindowManager)getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
         setTodayDate(new Date());
-        setSelectedDate(new Date());
+
+        // check to see if the user has switched back to the app in the last 3 minutes.
+        // if they have, load the date they were previously viewing.  If they haven't, load today's date onResume
+
+        if (mSavedDate != null) {
+            //Log.i(TAG, "mSavedDate wasn't null ===========> " + mSavedDate.toString());
+            DateTime savedDateTime = new DateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(mSavedDate));
+            mCurrentDateTime = new DateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(mTodayDate));
+            //Log.i(TAG,"WHAT DAY IS IT.... getDay: " + mCurrentDateTime.getDay() + " getWeekDay: " + mCurrentDateTime.getWeekDay());
+            if (savedDateTime.numSecondsFrom(mCurrentDateTime) < 180) {
+                //Log.i(TAG, "THIS WAS RESTORED RECENTLY ===========> " + savedDateTime.numSecondsFrom(currentDateTime));
+                try {
+                    mSelectedDate = new SimpleDateFormat("yyyyMMdd").parse(mSelectedDateString);
+                    setSelectedDate(mSelectedDate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }// compare current date to saved date... probably
+
+
+            else {
+                setSelectedDate(new Date());
+            }
+        }
+
+        else {
+            setSelectedDate(new Date());
+        }
+
+
         checkCalendarUpdates();
         updateDisplay();
 
@@ -319,21 +410,27 @@ public class MainActivity extends AppCompatActivity {
         mEditor = mSharedPreferences.edit();
         Calendar calendar = Calendar.getInstance();
         int currentTime = Integer.parseInt(new SimpleDateFormat("Hmm").format(calendar.getTime()));
+        mCurrentDateTime = new DateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(mTodayDate));
 
 
         //!! Log.i(TAG,"Our time right now is ===========> " + currentTime);
         //!! Log.i(TAG,"The last time we checked the version was ===========> " + mSharedPreferences.getInt(KEY_DATEVERSIONCHECK,0) + " AND today's date = " + mTodayDateInt);
 
 
-        // mTodayDateInt (int) used to check to see if we've checked for schedule version updates today.
-        // currentTime (int) used to see if it's before 8:15am, if it is we check for version updates even if we've checked already (weather-related late start change)
+        // mTodayDateInt (int) used to check to see if we've checked for schedule version updates today. If not, check fo rupdates.
+        // currentTime (int) used to see if  the time is before 8:15 if it is 8:30 or after 4:30, if it is
+        // we check for version updates even if we've checked already today (in case of weather-related late start change)
+        // The program also checks the version file every time the app is opened on a weekend, regardless of the time.
 
 
-        if (mSharedPreferences.getInt(KEY_DATEVERSIONCHECK,0)==0 || mTodayDateInt > mSharedPreferences.getInt(KEY_DATEVERSIONCHECK,0)  || currentTime < 815 )  {
-            //!! Log.i(TAG,"Looks like we either haven't checked the version at all or haven't checked it since yesterday ===========> ");
+        if (mSharedPreferences.getInt(KEY_DATEVERSIONCHECK,0)==0 || mTodayDateInt > mSharedPreferences.getInt(KEY_DATEVERSIONCHECK,0)  ||
+                currentTime < 830 || currentTime > 1630 || mCurrentDateTime.getWeekDay() == 7 || mCurrentDateTime.getWeekDay()== 1 )  {
+            //Log.i(TAG,"Looks like we either haven't checked the version at all or haven't checked it since yesterday ===========> ");
             // if we have a working network connection we run our code, if not we pop up a toast message saying we don't have one right now.
             // TODO: What to do if no network? Add a refresh button? Automatically attempt every 5 minutes until we get a network connection (battery issues).
             if (isNetworkAvailable()) {
+                // Doesn't appear to do what I want.  Revisit?
+                //mSummaryLabel.setText(" LOADING UPDATE");
 
 
                 //Create OkHttp client and build the request
@@ -389,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
                                                 mEditor.apply();
 
                                                 if (response.isSuccessful()) {
-                                                    mScheduleType = getCurrentDetails(jsonData);
+                                                    //mScheduleType = getCurrentDetails(jsonData);
                                                     Request periodRequest = new Request.Builder()
                                                             .url(periodUrl)
                                                             .build();
@@ -405,12 +502,20 @@ public class MainActivity extends AppCompatActivity {
                                                         @Override
                                                         public void onResponse(Call call, Response response) throws IOException {
                                                             String periodScheduleData = response.body().string();
-                                                            mJsonPeriodScheduleData = periodScheduleData;
-                                                            mEditor.putString(KEY_JSONPERIODSCHEDULEDATA, mJsonPeriodScheduleData);
+                                                            //I never use this.
+                                                            //mJsonPeriodScheduleData = periodScheduleData;
+                                                            mEditor.putString(KEY_JSONPERIODSCHEDULEDATA, periodScheduleData);
                                                             mEditor.apply();
+
+                                                            // re-runs updateDisplay if there's a change so that today's info immediately reflects the change.
                                                             if (response.isSuccessful()){
+                                                                updateDisplay();
+                                                            }
+
+                                                            // I'm doing this inside of updateDisplay now, I don't need to do it here.
+/*                                                            if (response.isSuccessful()){
                                                                 try {
-                                                                     /*mPeriod = getDailySchedule(mScheduleType, periodScheduleData);*/
+                                                                     *//*mPeriod = getDailySchedule(mScheduleType, periodScheduleData);*//*
                                                                     mPeriods = getPeriodSchedule(periodScheduleData);
 
 
@@ -434,19 +539,19 @@ public class MainActivity extends AppCompatActivity {
                                                                 } catch (JSONException e) {
                                                                     //!! Log.e(TAG, "Exception caught: ", e);
                                                                 }
-                                                            }
+                                                            }*/
                                                         }
                                                     });
 
 
                                                     // You have to update the UI on the UI thread, otherwise you get a "CalledFromWrongThreadException"
-                                                    runOnUiThread(new Runnable() {
+/*                                                    runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {
                                                             mSummaryLabel.setText(mScheduleType.getScheduleType());
 
                                                         }
-                                                    });
+                                                    });*/
 
                                                 } else {
                                                     // Log.i(TAG,"FAILURE 999999999999999999999999");
@@ -456,9 +561,9 @@ public class MainActivity extends AppCompatActivity {
                                             catch (IOException e) {
                                                 //!! Log.e(TAG, "Exception caught: ", e);
                                             }
-                                            catch (JSONException e){
+/*                                            catch (JSONException e){
                                                 //!! Log.e(TAG, "Exception caught: ", e);
-                                            }
+                                            }*/
                                         }
                                     });
 
@@ -534,6 +639,11 @@ public class MainActivity extends AppCompatActivity {
                     // Weird error (probably my fault) that seems to cause relativelayout in recyclerview to increase in size by 1 pixel every time we refresh.
                     //mDividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),1);
                     //mRecyclerView.addItemDecoration(mDividerItemDecoration);
+
+
+                    //mRecyclerView.setNestedScrollingEnabled(false);
+
+                    // the Custom divider works great.  Built-in divider expanded for some reason.  Probalby a bug but didn't want to look at it.
                     mRecyclerView.addItemDecoration(new CustomDividerItemDecoration(mRecyclerView.getContext()));
                     mRecyclerView.setAdapter(adapter);
                     mRecyclerView.setLayoutManager(layoutManager);
@@ -550,9 +660,7 @@ public class MainActivity extends AppCompatActivity {
         JSONObject calendarSchedule = new JSONObject(jsonData);
         ScheduleType scheduleType = new ScheduleType();
         boolean matchFound = false;
-/*        if (mSharedPreferences!=null && !mCompactCalendarView.equals(null)) {
 
-        }*/
         /*
         First we get the JSONArray using schedule
         Then we iterate through the array using a for loop looking for today's date
@@ -572,6 +680,9 @@ public class MainActivity extends AppCompatActivity {
                 scheduleType.setScheduleType(calendarScheduleDayObject.getString("SUMMARY"));
                 matchFound = true;
             }
+
+            // if there's a day off (SUMMARY = NO SCHOOL, CONFERENCES, SPRING BREAK, OR WINTER BREAK) draw a white circle around the date in the date picker
+
             if (calendarScheduleDayObject.getString("SUMMARY").equals("NO SCHOOL")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("CONFERENCES")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("SPRING BREAK")
@@ -590,6 +701,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
+
+        // if there's no match with the schedule type the schedule type should be set to either:
+        // NO SCHOOL (if it's a weekday) or
+        // WEEKEND (if it's a Saturday or Sunday)
 
         if(!matchFound){
             if (mSelectedDateTime.getWeekDay() == 7 || mSelectedDateTime.getWeekDay() == 1 ){
@@ -672,25 +787,29 @@ public class MainActivity extends AppCompatActivity {
 
 
     private Period[] getPeriodSchedule(String jsonData) throws JSONException {
+        /* scheduleNames is a list of all valid schedule types (any type which appears (or could appear) in schoolYearSchedule.json and periodSchedule.json.
+        *
+        * I whitelist ScheduleTypes because the data is messy and hunting down all the outliers is more of a pain than it's worth. It also lets me declare any non-weekend
+        * day without a schedule a "NO SCHOOL" day, which means I can gracefully handle summer break and any other vacation day that are not in the Google Calendar I import.
+        *
+        * Edit scheduleNames to match whatever schedule types you have in your calendar.  Anything not in scheduleNames will be considered "NO SCHOOL"
+        * I've added a bunch of "SPECIAL" options so that I have flexibility in the case of one-off schedules without having to publish a new version of the app.
+        *
+        */
+
+        String[] scheduleNames = {"A","B","A-FLEX","B-FLEX","A-RACEFORWARD","B-RACEFORWARD","A-LATE START","B-LATE START","A-EARLY DISMISSAL", "B-EARLY DISMISSAL", "ACT",
+                "A-ACT","B-ACT","A-PSAT","B-PSAT","PSAT","FINALS-1","FINALS-2","FINALS-3", "SPECIAL", "SPECIAL-2", "SPECIAL-3","A-SPECIAL-1","A-SPECIAL-2","A-SPECIAL-3",
+                "B-SPECIAL-1","B-SPECIAL-2","B-SPECIAL-3", "SKINNY"};
         JSONObject periodBells = new JSONObject(jsonData);
+        boolean foundScheduleName = false;
+        for (int i = 0; i < scheduleNames.length ; i++) {
+            if (mScheduleType.getScheduleType().equals(scheduleNames[i])){
+                foundScheduleName=true;
+            }
+        }
         Period[] periods;
-        // We whitelist ScheduleTypes because the data is messy and hunting down all the outliers is more of a pain than it's worth.  I may regret this later.
-        if (mScheduleType.getScheduleType().equals("A") ||
-                mScheduleType.getScheduleType().equals("B") ||
-                mScheduleType.getScheduleType().equals("A-FLEX") ||
-                mScheduleType.getScheduleType().equals("B-FLEX") ||
-                mScheduleType.getScheduleType().equals("B-RACEFORWARD") ||
-                mScheduleType.getScheduleType().equals("A-RACEFORWARD") ||
-                mScheduleType.getScheduleType().equals("FINALS-1") ||
-                mScheduleType.getScheduleType().equals("FINALS-2") ||
-                mScheduleType.getScheduleType().equals("FINALS-3") ||
-                mScheduleType.getScheduleType().equals("SPECIAL") || // Putting this here so that I can be flexible when there's some sort of one-off schedule
-                mScheduleType.getScheduleType().equals("A-ACT") ||
-                mScheduleType.getScheduleType().equals("B-PSAT") ||
-                mScheduleType.getScheduleType().equals("A-LATE START") ||
-                mScheduleType.getScheduleType().equals("B-LATE START") ||
-                mScheduleType.getScheduleType().equals("A-EARLY DISMISSAL") ||
-                mScheduleType.getScheduleType().equals("B-EARLY DISMISSAL")){
+
+        if (foundScheduleName){
                     JSONArray periodScheduleArray = periodBells.getJSONArray(mScheduleType.getScheduleType());
                     periods = new Period[periodScheduleArray.length()];
 
