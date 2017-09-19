@@ -508,8 +508,16 @@ public class MainActivity extends AppCompatActivity {
                                                             mEditor.apply();
 
                                                             // re-runs updateDisplay if there's a change so that today's info immediately reflects the change.
+                                                            // You have to update the UI on the UI thread, otherwise you get a "CalledFromWrongThreadException"
                                                             if (response.isSuccessful()){
-                                                                updateDisplay();
+                                                                runOnUiThread(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        updateDisplay();
+
+                                                                    }
+                                                                });
+
                                                             }
 
                                                             // I'm doing this inside of updateDisplay now, I don't need to do it here.
