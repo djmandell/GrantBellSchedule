@@ -18,6 +18,7 @@ import android.view.Display;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -91,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
     private int mSelectedDateInt;
     private DateTime mSelectedDateTime;
     private SimpleDateFormat mYearMonthDayFormatter =  new SimpleDateFormat("yyyyMMdd");
+    private OnSwipeTouchListener onSwipeTouchListener;
+    private RecyclerView mRecyclerView;
 
 
 
@@ -119,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+
 
 
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -244,7 +249,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ImageView leftArrow = (ImageView) findViewById(R.id.leftArrow);
+        // commented out the old arrow navigation because I don't need it any more (swipe left/right)
+
+       /* ImageView leftArrow = (ImageView) findViewById(R.id.leftArrow);
 
         leftArrow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -280,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
                 //!! Log.i(TAG,"CLICKED RIGHT ARROW ===========> ");
                 updateDisplay();
             }
-        });
+        });*/
 
         // the TextViews (and other visible stuff) aren't created until setContentView is called.  If you you try to do stuff like below before setContentView you end up with a null object reference
         mSummaryLabel = (TextView)findViewById(R.id.scheduleTypeLabel);
@@ -290,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /* I put all of this code in onResume because there's no guarnatee that the app will get destroyed.
+    /* I put all of this code in onResume because there's no guarantee that the app will get destroyed.
     If app stays in memory overnight I want it to check for a new version file the next day, which means all of this needs to be in onResume (right?)
 
     onResume we now:
@@ -321,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
             DateTime savedDateTime = new DateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(mSavedDate));
             mCurrentDateTime = new DateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(mTodayDate));
             //Log.i(TAG,"WHAT DAY IS IT.... getDay: " + mCurrentDateTime.getDay() + " getWeekDay: " + mCurrentDateTime.getWeekDay());
-            if (savedDateTime.numSecondsFrom(mCurrentDateTime) < 180) {
+            if (savedDateTime.numSecondsFrom(mCurrentDateTime) < 150) {
                 //Log.i(TAG, "THIS WAS RESTORED RECENTLY ===========> " + savedDateTime.numSecondsFrom(currentDateTime));
                 try {
                     mSelectedDate = new SimpleDateFormat("yyyyMMdd").parse(mSelectedDateString);
@@ -520,46 +527,10 @@ public class MainActivity extends AppCompatActivity {
 
                                                             }
 
-                                                            // I'm doing this inside of updateDisplay now, I don't need to do it here.
-/*                                                            if (response.isSuccessful()){
-                                                                try {
-                                                                     *//*mPeriod = getDailySchedule(mScheduleType, periodScheduleData);*//*
-                                                                    mPeriods = getPeriodSchedule(periodScheduleData);
 
-
-                                                                    runOnUiThread(new Runnable() {
-                                                                        @Override
-                                                                        public void run() {
-                                                                            PeriodAdapter adapter = new PeriodAdapter(mPeriods);
-                                                                            adapter.setDateNumber(mSelectedDateInt);
-                                                                            adapter.setTodayDateNumber(mTodayDateInt);
-                                                                            //!! Log.i(TAG,"UPDATED DISPLAY AFTER UPDATING SCHEDULE DATA (DISPLAY SCHEDULE METHOD) using this date: ----------->" + mTodayDateInt );
-                                                                            RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-                                                                            mDividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),1);
-                                                                            mRecyclerView.addItemDecoration(mDividerItemDecoration);
-                                                                            mRecyclerView.setAdapter(adapter);
-                                                                            mRecyclerView.setLayoutManager(layoutManager);
-
-                                                                        }
-                                                                    });
-
-
-                                                                } catch (JSONException e) {
-                                                                    //!! Log.e(TAG, "Exception caught: ", e);
-                                                                }
-                                                            }*/
                                                         }
                                                     });
 
-
-                                                    // You have to update the UI on the UI thread, otherwise you get a "CalledFromWrongThreadException"
-/*                                                    runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            mSummaryLabel.setText(mScheduleType.getScheduleType());
-
-                                                        }
-                                                    });*/
 
                                                 } else {
                                                     // Log.i(TAG,"FAILURE 999999999999999999999999");
@@ -611,6 +582,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateDisplay(){
+
         //!! Log.i(TAG,"BEGINNING TO UPDATE DISPLAY ===========> " + mSelectedDate + " " + mTodayDateInt);
         if (mSharedPreferences != null){
             mSharedPreferences = getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE);
@@ -639,11 +611,55 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     mSummaryLabel.setText(mScheduleType.getScheduleType());
-                    PeriodAdapter adapter = new PeriodAdapter(mPeriods);;
+                    PeriodAdapter adapter = new PeriodAdapter(mPeriods);
                     adapter.setDateNumber(mSelectedDateInt);
                     adapter.setTodayDateNumber(mTodayDateInt);
                     //!! Log.i(TAG,"UPDATED DISPLAY IN UPDATEDISPLAY METHOD ----------->" );
-                    RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+                    mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+                    onSwipeTouchListener = new OnSwipeTouchListener(MainActivity.this){
+                        public void onSwipeTop() {
+                            //Toast.makeText(MainActivity.this, "top", Toast.LENGTH_SHORT).show();
+                        }
+                        public void onSwipeRight() {
+                            String yesterdayDateString = ((mSelectedDateInt -1) + "");
+                            Date yesterdayDate = mSelectedDate;
+                            try {
+                                yesterdayDate = mYearMonthDayFormatter.parse(yesterdayDateString);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            setSelectedDate(yesterdayDate);
+                            mOldDateStringPreScroll = mSelectedDateTime.format("D MMMM YYYY", Locale.US);
+                            //!! Log.i(TAG,"CLICKED LEFT ARROW ===========> ");
+                            mRecyclerView.startAnimation(AnimationUtils.loadAnimation(
+                                    MainActivity.this,R.anim.push_right_out
+                            ));
+                            updateDisplay();
+                        }
+                        public void onSwipeLeft() {
+                            String tomorrowDateString = ((mSelectedDateInt + 1) + "");
+                            Date tomorrowDate = mSelectedDate;
+                            try {
+                                tomorrowDate = mYearMonthDayFormatter.parse(tomorrowDateString);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            setSelectedDate(tomorrowDate);
+                            mOldDateStringPreScroll = mSelectedDateTime.format("D MMMM YYYY", Locale.US);
+                            //!! Log.i(TAG,"CLICKED RIGHT ARROW ===========> ");
+                            mRecyclerView.startAnimation(AnimationUtils.loadAnimation(
+                                    MainActivity.this,R.anim.push_left_out
+                            ));
+
+                            updateDisplay();
+                        }
+                        public void onSwipeBottom() {
+                            //Toast.makeText(MainActivity.this, "bottom", Toast.LENGTH_SHORT).show();
+                        }
+                    };
+                    mRecyclerView.setOnTouchListener(onSwipeTouchListener);
+
+
                     // Weird error (probably my fault) that seems to cause relativelayout in recyclerview to increase in size by 1 pixel every time we refresh.
                     //mDividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),1);
                     //mRecyclerView.addItemDecoration(mDividerItemDecoration);
@@ -806,8 +822,8 @@ public class MainActivity extends AppCompatActivity {
         */
 
         String[] scheduleNames = {"A","B","A-FLEX","B-FLEX","A-RACEFORWARD","B-RACEFORWARD","A-LATE START","B-LATE START","A-EARLY DISMISSAL", "B-EARLY DISMISSAL", "ACT",
-                "A-ACT","B-ACT","A-PSAT","B-PSAT","PSAT","FINALS-1","FINALS-2","FINALS-3", "SPECIAL", "SPECIAL-2", "SPECIAL-3","A-SPECIAL-1","A-SPECIAL-2","A-SPECIAL-3",
-                "B-SPECIAL-1","B-SPECIAL-2","B-SPECIAL-3", "SKINNY"};
+                "A-ACT","B-ACT","A-PSAT","B-PSAT","PSAT","A-FLEX-ASSEMBLY","B-FLEX-ASSEMBLY","ASSEMBLY","FINALS-1","FINALS-2","FINALS-3", "SPECIAL",
+                "SPECIAL-1","SPECIAL-2", "SPECIAL-3","A-SPECIAL-1","A-SPECIAL-2","A-SPECIAL-3","B-SPECIAL-1","B-SPECIAL-2","B-SPECIAL-3", "SKINNY"};
         JSONObject periodBells = new JSONObject(jsonData);
         boolean foundScheduleName = false;
         for (int i = 0; i < scheduleNames.length ; i++) {
