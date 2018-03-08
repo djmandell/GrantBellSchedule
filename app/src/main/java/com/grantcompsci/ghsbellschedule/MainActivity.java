@@ -18,6 +18,7 @@ import android.view.Display;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -100,8 +101,7 @@ public class MainActivity extends AppCompatActivity {
     static final String SAVED_DATE_STRING = "saved_date_string";
     static final String SELECTED_DATE_INT_KEY = "selected_date_int_key";
     static final String SELECTED_DATE_STRING_KEY = "selected_date_string_key";
-    //static final String ROTATED_KEY = "rotated_key";
-    //static final String ROTATION_KEY = "rotation_key";
+
     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
 
 
@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         savedInstanceState.putString(SAVED_DATE_STRING, new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
         savedInstanceState.putInt(SELECTED_DATE_INT_KEY, mSelectedDateInt);
         savedInstanceState.putString(SELECTED_DATE_STRING_KEY, mSelectedDateString);
+
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
         System.out.println();
@@ -249,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // commented out the old arrow navigation because I don't need it any more (swipe left/right)
+        // commented out the old arrow navigation because I don't think I need it any more (swipe left/right is implemented)
 
        /* ImageView leftArrow = (ImageView) findViewById(R.id.leftArrow);
 
@@ -403,7 +404,8 @@ public class MainActivity extends AppCompatActivity {
             2) If the DATE/VERSION on the server are greater than the one we've got in SharedPrefs we download the SchedulePeriod data and store it in shared Prefs
 
              AB Calendar grabbed from here: https://calendar.google.com/calendar/embed?src=u2r5154prrjr5uhukp71857g70%40group.calendar.google.com&ctz=America/Los_Angeles%22
-
+             2017-18 Calendar grabbed from here: https://www.pps.net/site/handlers/icalfeed.ashx?MIID=13161
+             used ical2json app to convert the ical (ics) file to a JSON file (syntax: ical2json calendarName.ics)
 
          */
         String siteName = "http://www.grantcompsci.com/bellapp/";
@@ -424,13 +426,18 @@ public class MainActivity extends AppCompatActivity {
         //!! Log.i(TAG,"The last time we checked the version was ===========> " + mSharedPreferences.getInt(KEY_DATEVERSIONCHECK,0) + " AND today's date = " + mTodayDateInt);
 
 
-        // mTodayDateInt (int) used to check to see if we've checked for schedule version updates today. If not, check fo rupdates.
-        // currentTime (int) used to see if  the time is before 8:15 if it is 8:30 or after 4:30, if it is
+        // mTodayDateInt (int) used to check to see if we've checked for schedule version updates today. If not, check for updates.
+        // currentTime (int) used to see if the time is before 8:30 or after 4:30, if it is
         // we check for version updates even if we've checked already today (in case of weather-related late start change)
+        // If today's schedule is a late start we check for schedule changes all day, just in case they change from late start to no school.
+        // If we've never downloaded the schedule
         // The program also checks the version file every time the app is opened on a weekend, regardless of the time.
+        if (mScheduleType != null){
+            //Log.i(TAG,"YOOOOOOOOO! " + mScheduleType.getScheduleType());
+        }
 
-
-        if (mSharedPreferences.getInt(KEY_DATEVERSIONCHECK,0)==0 || mTodayDateInt > mSharedPreferences.getInt(KEY_DATEVERSIONCHECK,0)  ||
+        if ((mScheduleType != null && (mScheduleType.getScheduleType().equals("B-LATE START") || mScheduleType.getScheduleType().equals("A-LATE START")))
+                || mSharedPreferences.getInt(KEY_DATEVERSIONCHECK,0)==0 || mTodayDateInt > mSharedPreferences.getInt(KEY_DATEVERSIONCHECK,0)  ||
                 currentTime < 830 || currentTime > 1630 || mCurrentDateTime.getWeekDay() == 7 || mCurrentDateTime.getWeekDay()== 1 )  {
             //Log.i(TAG,"Looks like we either haven't checked the version at all or haven't checked it since yesterday ===========> ");
             // if we have a working network connection we run our code, if not we pop up a toast message saying we don't have one right now.
@@ -559,10 +566,14 @@ public class MainActivity extends AppCompatActivity {
             }
 
             else {
+                // Sometimes seems to result in a "NOT CONNECTED" error when device wakes up and app already open.
+                // Commenting this out for now, as there's no way to manually refresh and this message would
+                // probably just be confusing.
+
                 //potentially can make the toast persist for more than 3 seconds by using "The best solution" on http://stackoverflow.com/questions/2220560/can-an-android-toast-be-longer-than-toast-length-long
                 //TODO: Figure out how long to make this message.  Don't know that students even need to see it.
-                Toast.makeText(this, R.string.network_unavailable_message,
-                        Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, R.string.network_unavailable_message,
+                        //Toast.LENGTH_LONG).show();
 
             }
 
@@ -621,6 +632,10 @@ public class MainActivity extends AppCompatActivity {
                             //Toast.makeText(MainActivity.this, "top", Toast.LENGTH_SHORT).show();
                         }
                         public void onSwipeRight() {
+
+                            mRecyclerView.startAnimation(AnimationUtils.loadAnimation(
+                                    MainActivity.this,R.anim.push_right_in
+                            ));
                             String yesterdayDateString = ((mSelectedDateInt -1) + "");
                             Date yesterdayDate = mSelectedDate;
                             try {
@@ -631,12 +646,14 @@ public class MainActivity extends AppCompatActivity {
                             setSelectedDate(yesterdayDate);
                             mOldDateStringPreScroll = mSelectedDateTime.format("D MMMM YYYY", Locale.US);
                             //!! Log.i(TAG,"CLICKED LEFT ARROW ===========> ");
-                            mRecyclerView.startAnimation(AnimationUtils.loadAnimation(
-                                    MainActivity.this,R.anim.push_right_out
-                            ));
+
                             updateDisplay();
                         }
                         public void onSwipeLeft() {
+                            //!! Log.i(TAG,"CLICKED RIGHT ARROW ===========> ");
+                            mRecyclerView.startAnimation(AnimationUtils.loadAnimation(
+                                    MainActivity.this,R.anim.push_left_in
+                            ));
                             String tomorrowDateString = ((mSelectedDateInt + 1) + "");
                             Date tomorrowDate = mSelectedDate;
                             try {
@@ -646,10 +663,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                             setSelectedDate(tomorrowDate);
                             mOldDateStringPreScroll = mSelectedDateTime.format("D MMMM YYYY", Locale.US);
-                            //!! Log.i(TAG,"CLICKED RIGHT ARROW ===========> ");
-                            mRecyclerView.startAnimation(AnimationUtils.loadAnimation(
-                                    MainActivity.this,R.anim.push_left_out
-                            ));
+
 
                             updateDisplay();
                         }
@@ -692,15 +706,21 @@ public class MainActivity extends AppCompatActivity {
                 if matchFound is false (after loop's end) setScheduleType to "NO SCHOOL"
         When we find it we use scheduleType to set scheduleType to our schedule type ("B-FLEX", etc).
 
-        TODO:  I had to manually edit data, but we might need to replace calendar later.  Better to use default iCal download, right?
+        TODO:  I manually edited calendar data.  It might be better if I just use the data exactly as it comes from Google.  If so, changes will have to be made to the parser
          */
         //String scheduleSummary;
+
+        // THE JSON ARRAY CONTAINING THE SCHEDULE (name in JSON is "VEVENT")
         JSONArray calendarScheduleArray = calendarSchedule.getJSONArray("VEVENT");
+
+        // LOOP THROUGH THE ARRAY LOOKING FOR THE DATE WE WANT TO DISPLAY
         for (int i = 0; i < calendarScheduleArray.length(); i++) {
+
+            // MAKE A JSONOBJECT FOR EACH DAY SO THAT WE CAN LOOK AT THE BELL SCHEDULE FOR THAT DAY
             JSONObject calendarScheduleDayObject = calendarScheduleArray.getJSONObject(i);
+
+            // IF WE FIND THE DATE THAT WE'RE LOOKING FOR THEN GET THE "SUMMARY" WHICH IS THE SCHEDULE TYPE (A-FLEX, B, ETC)
             if (calendarScheduleDayObject.getString("DTSTART;VALUE=DATE").equals(mSelectedDateString)){
-              //scheduleSummary = calendarScheduleDayObject.getString("SUMMARY");
-                //!! Log.i(TAG,"SCHEDULE TYPE FOR THIS DATE ===========> " + scheduleSummary);
                 scheduleType.setScheduleType(calendarScheduleDayObject.getString("SUMMARY"));
                 matchFound = true;
             }
@@ -719,7 +739,47 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                mCompactCalendarView.addEvent(new Event(Color.WHITE,eventDate.getTime()));
+                mCompactCalendarView.addEvent(new Event(Color.WHITE,eventDate.getTime()), true);
+
+
+            }
+
+            // if there's an unusual schedule type (ACT, PSAT, RACEFORWARD, FINALS, EARLY DISMISSAL, LATE START, SPECIAL, etc)
+            // draw a green circle around the date in the date picker
+            if (calendarScheduleDayObject.getString("SUMMARY").equals("A-ACT")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-ACT")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("ACT")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-RACEFORWARD")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-RACEFORWARD")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-PSAT")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-PSAT")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("PSAT")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-EARLY DISMISSAL")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-EARLY DISMISSAL")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-LATE START")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-LATE START")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("FINALS-1")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("FINALS-2")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("FINALS-3")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("SPECIAL")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("SPECIAL-1")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("SPECIAL-2")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("SPECIAL-3")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-SPECIAL-1")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-SPECIAL-2")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-SPECIAL-3")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-SPECIAL-1")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-SPECIAL-2")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-SPECIAL-3")){
+                Date eventDate = new Date();
+                String eventDateString = calendarScheduleDayObject.getString("DTSTART;VALUE=DATE");
+                try {
+                    eventDate = new SimpleDateFormat("yyyyMMdd").parse(eventDateString);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                mCompactCalendarView.addEvent(new Event(Color.parseColor("#46f900"),eventDate.getTime()), true);
 
 
             }
@@ -881,6 +941,7 @@ public class MainActivity extends AppCompatActivity {
         ConnectivityManager manager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
         boolean isAvailable=false;
+        //Log.d("GRRRR",networkInfo.isConnectedOrConnecting() + " connecting?: " + networkInfo.isConnected() + " is connected");
         if (networkInfo !=null && networkInfo.isConnected()){
             isAvailable = true;
         }

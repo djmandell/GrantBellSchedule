@@ -95,8 +95,13 @@ public class PeriodAdapter extends RecyclerView.Adapter<PeriodAdapter.PeriodView
                periodEnd and the selectedDateString and converts them to Date objects so that they can be compared.
 
              */
-            if (!period.getPeriodStart().equals(" ")) {
+            if (!period.getPeriodStart().equals(" ") && !period.getPeriodStart().equals("")) {
+
+
                 try {
+                    // Sometimes we don't have a period start or end time (PSAT day has weird schedules, late start has "check PPS" message)
+                    // Only try to parse period start/end if there is a period start/end
+
 
                     periodStartTimeDate = new SimpleDateFormat("hh:mma").parse(period.getPeriodStart());
 
