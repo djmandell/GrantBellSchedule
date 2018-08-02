@@ -428,7 +428,8 @@ public class MainActivity extends AppCompatActivity {
 
         // mTodayDateInt (int) used to check to see if we've checked for schedule version updates today. If not, check for updates.
         // currentTime (int) used to see if the time is before 8:30 or after 4:30, if it is
-        // we check for version updates even if we've checked already today (in case of weather-related late start change)
+        // we check for version updates even if we've checked already today (in case of weather-related late
+        // change)
         // If today's schedule is a late start we check for schedule changes all day, just in case they change from late start to no school.
         // If we've never downloaded the schedule
         // The program also checks the version file every time the app is opened on a weekend, regardless of the time.
@@ -472,6 +473,7 @@ public class MainActivity extends AppCompatActivity {
                                 // Check to see if we have an older version than the most recent published version
                                 latestVersion = checkVersionUpdate(versionJsonData);
                                 if (!latestVersion) {
+                                    
                                     Request request = new Request.Builder()
                                             .url(scheduleUrl)
                                             .build();
@@ -552,6 +554,7 @@ public class MainActivity extends AppCompatActivity {
                                             }*/
                                         }
                                     });
+
 
 
                                 }
@@ -749,18 +752,30 @@ public class MainActivity extends AppCompatActivity {
             if (calendarScheduleDayObject.getString("SUMMARY").equals("A-ACT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-ACT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("ACT")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-ASSEMBLY")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-ASSEMBLY")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("ASSEMBLY")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("FIRST DAY")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("LAST DAY")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("A-RACEFORWARD")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-RACEFORWARD-2")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-RACEFORWARD-3")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-RACEFORWARD")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-RACEFORWARD-2")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-RACEFORWARD-3")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("A-PSAT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-PSAT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("PSAT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("A-EARLY DISMISSAL")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-EARLY DISMISSAL")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("EARLY DISMISSAL")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("A-LATE START")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-LATE START")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("LATE START")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("FINALS-1")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("FINALS-2")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("FINALS-3")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("ALL PERIODS")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("SPECIAL")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("SPECIAL-1")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("SPECIAL-2")
@@ -881,9 +896,11 @@ public class MainActivity extends AppCompatActivity {
         *
         */
 
-        String[] scheduleNames = {"A","B","A-FLEX","B-FLEX","A-RACEFORWARD","B-RACEFORWARD","A-LATE START","B-LATE START","A-EARLY DISMISSAL", "B-EARLY DISMISSAL", "ACT",
-                "A-ACT","B-ACT","A-PSAT","B-PSAT","PSAT","A-FLEX-ASSEMBLY","B-FLEX-ASSEMBLY","ASSEMBLY","FINALS-1","FINALS-2","FINALS-3", "SPECIAL",
-                "SPECIAL-1","SPECIAL-2", "SPECIAL-3","A-SPECIAL-1","A-SPECIAL-2","A-SPECIAL-3","B-SPECIAL-1","B-SPECIAL-2","B-SPECIAL-3", "SKINNY"};
+        String[] scheduleNames = {"A","B","A-FLEX","B-FLEX","A-RACEFORWARD","B-RACEFORWARD", "A-RACEFORWARD-2", "A-RACEFORWARD-3", "B-RACEFORWARD-2", "B-RACEFORWARD-3",
+                "A-LATE START","B-LATE START","A-EARLY DISMISSAL", "B-EARLY DISMISSAL", "ACT","A-ACT","B-ACT","A-PSAT","B-PSAT","PSAT","FINALS-1","FINALS-2","FINALS-3",
+                "SPECIAL", "SPECIAL-1","SPECIAL-2", "SPECIAL-3","A-SPECIAL-1","A-SPECIAL-2","A-SPECIAL-3","B-SPECIAL-1","B-SPECIAL-2","B-SPECIAL-3",
+                "SKINNY", "ALL PERIODS", "LATE START", "EARLY DISMISSAL","A-FLEX-ASSEMBLY","B-FLEX-ASSEMBLY","ASSEMBLY","A-ASSEMBLY", "FIRST DAY",
+                "LAST DAY", "B-ASSEMBLY"};
         JSONObject periodBells = new JSONObject(jsonData);
         boolean foundScheduleName = false;
         for (int i = 0; i < scheduleNames.length ; i++) {
