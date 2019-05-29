@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+
+    <group android:id="@+id/test">
+
+    </group>
+
+    <group android:checkableBehavior="none"
+        android:id="@+id/test2">
+        <item
+            android:id="@+id/period_settings"
+            android:icon="@drawable/ic_settings_blue"
+            android:background="?attr/colorPrimary"
+            android:title="Class Name Settings" />
+
+
+    </group>
+
+
+</menu>

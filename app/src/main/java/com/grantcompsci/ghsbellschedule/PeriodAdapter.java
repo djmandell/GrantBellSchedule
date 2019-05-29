@@ -1,8 +1,11 @@
 package com.grantcompsci.ghsbellschedule;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 //import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +59,7 @@ public class PeriodAdapter extends RecyclerView.Adapter<PeriodAdapter.PeriodView
     public void onBindViewHolder(PeriodViewHolder holder, int position) {
         holder.bindPeriod(mPeriods[position]);
     }
-//
+    //
     @Override
     public int getItemCount() {
         return mPeriods.length;
@@ -119,6 +122,12 @@ public class PeriodAdapter extends RecyclerView.Adapter<PeriodAdapter.PeriodView
                     e.printStackTrace();
                 }
             }
+            // make the TextViews views "GONE" (not take up space in the layout) if they don't contain text.
+            else{
+                mStartLabel.setVisibility(View.GONE);
+                mEndLabel.setVisibility(View.GONE);
+                mNameLabel.setGravity(Gravity.LEFT);
+            }
 
             /*Check to see if the current time is before the end of the period and after the start (-5 minutes).
               If so, the relativeLayout's background color will be blue and all the text will be white.
@@ -132,11 +141,12 @@ public class PeriodAdapter extends RecyclerView.Adapter<PeriodAdapter.PeriodView
 
             }
 
+
             mNameLabel.setText(period.getPeriodName());
             mStartLabel.setText(period.getPeriodStart());
             mEndLabel.setText(period.getPeriodEnd());
 
-
+//
 
         }
     }

@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId 'com.grantcompsci.ghsbellschedule'
         minSdkVersion 17
-        targetSdkVersion 26
-        versionCode 10
-        versionName "1.4.1"
+        targetSdkVersion 27
+        versionCode 11
+        versionName "1.5.0"
     }
     buildTypes {
         release {
@@ -21,15 +21,17 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:recyclerview-v7:26.1.0'
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.android.support:support-v4:26.1.0'
-    compile 'com.android.support:design:26.1.0'
-    compile 'com.squareup.okio:okio:1.11.0'
-    compile 'com.squareup.okhttp3:okhttp:3.4.1'
-    compile 'com.darwinsys:hirondelle-date4j:1.5.1'
-    compile 'com.github.sundeepk:compact-calendar-view:1.9.8'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:preference-v7:27.1.1'
+    implementation 'com.squareup.okio:okio:1.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.4.1'
+    implementation 'com.darwinsys:hirondelle-date4j:1.5.1'
+    implementation 'com.github.sundeepk:compact-calendar-view:3.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 
 }

@@ -1,40 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:id="@+id/periodListLayout"
-                tools:background="#ffffff"
-                android:background="#ffffff"
-                android:paddingTop="13dp"
-                android:paddingBottom="13dp">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/periodListLayout"
+    tools:background="#ffffff"
+    android:background="#ffffff"
+    android:paddingTop="13dp"
+    android:paddingBottom="13dp">
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/nameLabel"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:textSize="21sp"
-        tools:text="Race Fwd"
-        android:paddingLeft="10dp"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/nameLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/startLabel"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:autoSizeTextType="uniform"
+            android:textSize="21sp"
+            app:autoSizeMinTextSize="14sp"
+            app:autoSizeMaxTextSize="21sp"
+            android:lines="1"
+            android:ellipsize="end"
+            app:autoSizeStepGranularity="1sp"
+            app:layout_constraintHorizontal_weight="13"
+            tools:text="Race Fwd and that's a starting point"
+            android:paddingLeft="10dp"
+            android:paddingRight="8dp"
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="09:47am"
-        android:id="@+id/endLabel"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:textSize="21sp"
-        android:paddingRight="10dp"/>
+            android:gravity="center_vertical"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="08:15am"
-        android:id="@+id/startLabel"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:textSize="21sp"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tools:text="08:15am"
+            android:id="@+id/startLabel"
+            app:layout_constraintStart_toEndOf="@+id/nameLabel"
+            app:layout_constraintEnd_toStartOf="@+id/endLabel"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_weight="10"
+            android:gravity="center"
+            android:textSize="21sp"/>
+
+
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tools:text="09:47am"
+            android:id="@+id/endLabel"
+            app:layout_constraintStart_toEndOf="@+id/startLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:gravity="center"
+            android:textSize="21sp"
+            app:layout_constraintHorizontal_weight="10"
+            android:paddingRight="10dp"/>
+
+
+    </android.support.constraint.ConstraintLayout>
 </RelativeLayout>

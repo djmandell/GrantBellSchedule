@@ -1,12 +1,19 @@
 package com.grantcompsci.ghsbellschedule;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -15,6 +22,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Display;
+import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
@@ -43,22 +51,22 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     public static final String TAG = MainActivity.class.getSimpleName();
 
-        /*
+    /*
 
-       *
-       * Current Date = todayDate
-       *        Anything that depends on today's date and time gets stored here
-       *        (int, String, DateTime, Date, Calendar (?))
-       *
-       * Date user selects = mSelectedDate
-       *        Any time user goes forward one day/backward one day or selects a date from drop-down calendar it should set mSelectedDate
-       *        (int, String, DateTime, Date, Calendar (?))
-       *
+     *
+     * Current Date = todayDate
+     *        Anything that depends on today's date and time gets stored here
+     *        (int, String, DateTime, Date, Calendar (?))
+     *
+     * Date user selects = mSelectedDate
+     *        Any time user goes forward one day/backward one day or selects a date from drop-down calendar it should set mSelectedDate
+     *        (int, String, DateTime, Date, Calendar (?))
+     *
 
-    */
+     */
 
     private static final String PREFS_FILE = "com.grantcompsci.ghsbellschedule";
 
@@ -122,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
         System.out.println();
 
 
+
     }
 
 
@@ -163,11 +172,23 @@ public class MainActivity extends AppCompatActivity {
         setTitle("Grant Bell Schedule");
         mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
         // Set up the CompactCalendarView
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.bringToFront();
+
+
+
         mCompactCalendarView = (CompactCalendarView) findViewById(R.id.compactcalendar_view);
         // Force English and set first day of week to Sunday
         mCompactCalendarView.setLocale(TimeZone.getDefault(), Locale.US);
         mCompactCalendarView.setFirstDayOfWeek(Calendar.SUNDAY);
-       // mCompactCalendarView.setShouldDrawDaysHeader(true);
+        // mCompactCalendarView.setShouldDrawDaysHeader(true);
 
         mCompactCalendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
@@ -250,49 +271,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // commented out the old arrow navigation because I don't think I need it any more (swipe left/right is implemented)
 
-       /* ImageView leftArrow = (ImageView) findViewById(R.id.leftArrow);
-
-        leftArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String yesterdayDateString = ((mSelectedDateInt -1) + "");
-                Date yesterdayDate = mSelectedDate;
-                try {
-                    yesterdayDate = mYearMonthDayFormatter.parse(yesterdayDateString);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                setSelectedDate(yesterdayDate);
-                mOldDateStringPreScroll = mSelectedDateTime.format("D MMMM YYYY", Locale.US);
-                //!! Log.i(TAG,"CLICKED LEFT ARROW ===========> ");
-                updateDisplay();
-            }
-        });
-
-        ImageView rightArrow = (ImageView) findViewById(R.id.rightArrow);
-
-        rightArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String tomorrowDateString = ((mSelectedDateInt + 1) + "");
-                Date tomorrowDate = mSelectedDate;
-                try {
-                    tomorrowDate = mYearMonthDayFormatter.parse(tomorrowDateString);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                setSelectedDate(tomorrowDate);
-                mOldDateStringPreScroll = mSelectedDateTime.format("D MMMM YYYY", Locale.US);
-                //!! Log.i(TAG,"CLICKED RIGHT ARROW ===========> ");
-                updateDisplay();
-            }
-        });*/
 
         // the TextViews (and other visible stuff) aren't created until setContentView is called.  If you you try to do stuff like below before setContentView you end up with a null object reference
         mSummaryLabel = (TextView)findViewById(R.id.scheduleTypeLabel);
         mSummaryLabel.setText(" LOADING ");
+
+        // START THE PREFERENCES ACTIVITY
+/*        Intent i = new Intent(this, MyPreferencesActivity.class);
+        startActivity(i);*/
+
 
 
     }
@@ -473,7 +461,7 @@ public class MainActivity extends AppCompatActivity {
                                 // Check to see if we have an older version than the most recent published version
                                 latestVersion = checkVersionUpdate(versionJsonData);
                                 if (!latestVersion) {
-                                    
+
                                     Request request = new Request.Builder()
                                             .url(scheduleUrl)
                                             .build();
@@ -576,7 +564,7 @@ public class MainActivity extends AppCompatActivity {
                 //potentially can make the toast persist for more than 3 seconds by using "The best solution" on http://stackoverflow.com/questions/2220560/can-an-android-toast-be-longer-than-toast-length-long
                 //TODO: Figure out how long to make this message.  Don't know that students even need to see it.
                 //Toast.makeText(this, R.string.network_unavailable_message,
-                        //Toast.LENGTH_LONG).show();
+                //Toast.LENGTH_LONG).show();
 
             }
 
@@ -771,6 +759,8 @@ public class MainActivity extends AppCompatActivity {
                     || calendarScheduleDayObject.getString("SUMMARY").equals("EARLY DISMISSAL")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("A-LATE START")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-LATE START")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-FLEX-LATE START")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-FLEX-LATE START")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("LATE START")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("FINALS-1")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("FINALS-2")
@@ -887,20 +877,20 @@ public class MainActivity extends AppCompatActivity {
 
     private Period[] getPeriodSchedule(String jsonData) throws JSONException {
         /* scheduleNames is a list of all valid schedule types (any type which appears (or could appear) in schoolYearSchedule.json and periodSchedule.json.
-        *
-        * I whitelist ScheduleTypes because the data is messy and hunting down all the outliers is more of a pain than it's worth. It also lets me declare any non-weekend
-        * day without a schedule a "NO SCHOOL" day, which means I can gracefully handle summer break and any other vacation day that are not in the Google Calendar I import.
-        *
-        * Edit scheduleNames to match whatever schedule types you have in your calendar.  Anything not in scheduleNames will be considered "NO SCHOOL"
-        * I've added a bunch of "SPECIAL" options so that I have flexibility in the case of one-off schedules without having to publish a new version of the app.
-        *
-        */
+         *
+         * I whitelist ScheduleTypes because the data is messy and hunting down all the outliers is more of a pain than it's worth. It also lets me declare any non-weekend
+         * day without a schedule a "NO SCHOOL" day, which means I can gracefully handle summer break and any other vacation day that are not in the Google Calendar I import.
+         *
+         * Edit scheduleNames to match whatever schedule types you have in your calendar.  Anything not in scheduleNames will be considered "NO SCHOOL"
+         * I've added a bunch of "SPECIAL" options so that I have flexibility in the case of one-off schedules without having to publish a new version of the app.
+         *
+         */
 
         String[] scheduleNames = {"A","B","A-FLEX","B-FLEX","A-RACEFORWARD","B-RACEFORWARD", "A-RACEFORWARD-2", "A-RACEFORWARD-3", "B-RACEFORWARD-2", "B-RACEFORWARD-3",
                 "A-LATE START","B-LATE START","A-EARLY DISMISSAL", "B-EARLY DISMISSAL", "ACT","A-ACT","B-ACT","A-PSAT","B-PSAT","PSAT","FINALS-1","FINALS-2","FINALS-3",
                 "SPECIAL", "SPECIAL-1","SPECIAL-2", "SPECIAL-3","A-SPECIAL-1","A-SPECIAL-2","A-SPECIAL-3","B-SPECIAL-1","B-SPECIAL-2","B-SPECIAL-3",
                 "SKINNY", "ALL PERIODS", "LATE START", "EARLY DISMISSAL","A-FLEX-ASSEMBLY","B-FLEX-ASSEMBLY","ASSEMBLY","A-ASSEMBLY", "FIRST DAY",
-                "LAST DAY", "B-ASSEMBLY"};
+                "LAST DAY", "B-ASSEMBLY", "A-FLEX-LATE START", "B-FLEX-LATE START"};
         JSONObject periodBells = new JSONObject(jsonData);
         boolean foundScheduleName = false;
         for (int i = 0; i < scheduleNames.length ; i++) {
@@ -911,18 +901,64 @@ public class MainActivity extends AppCompatActivity {
         Period[] periods;
 
         if (foundScheduleName){
-                    JSONArray periodScheduleArray = periodBells.getJSONArray(mScheduleType.getScheduleType());
-                    periods = new Period[periodScheduleArray.length()];
+            JSONArray periodScheduleArray = periodBells.getJSONArray(mScheduleType.getScheduleType());
+            periods = new Period[periodScheduleArray.length()];
 
 
-                    for (int i = 0; i < periodScheduleArray.length(); i++) {
-                        JSONObject jsonPeriod = periodScheduleArray.getJSONObject((i));
-                        Period period = new Period();
-                        period.setPeriodName(jsonPeriod.getString("NAME"));
-                        period.setPeriodStart(jsonPeriod.getString("START"));
-                        period.setPeriodEnd(jsonPeriod.getString("END"));
+            for (int i = 0; i < periodScheduleArray.length(); i++) {
+                JSONObject jsonPeriod = periodScheduleArray.getJSONObject((i));
+                Period period = new Period();
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                if (!sp.getString("p1ClassName","NA").equals("NA") && !sp.getString("p1ClassName","NA").equals("") && jsonPeriod.getString("NAME").equals("P1")){
+                    String p1Name = sp.getString("p1ClassName", "NA");
+                    period.setPeriodName(p1Name);
+                }
 
-                        periods[i]=period;
+                else if (!sp.getString("p2ClassName","NA").equals("NA") && !sp.getString("p2ClassName","NA").equals("") && jsonPeriod.getString("NAME").equals("P2")){
+                    String p2Name = sp.getString("p2ClassName", "NA");
+                    period.setPeriodName(p2Name);
+                }
+
+                else if (!sp.getString("p3ClassName","NA").equals("NA") && !sp.getString("p3ClassName","NA").equals("") && jsonPeriod.getString("NAME").equals("P3")){
+                    String p3Name = sp.getString("p3ClassName", "NA");
+                    period.setPeriodName(p3Name);
+                }
+
+                else if (!sp.getString("p4ClassName","NA").equals("NA") && !sp.getString("p4ClassName","NA").equals("") && jsonPeriod.getString("NAME").equals("P4")){
+                    String p4Name = sp.getString("p4ClassName", "NA");
+                    period.setPeriodName(p4Name);
+                }
+
+                else if (!sp.getString("p5ClassName","NA").equals("NA") && !sp.getString("p5ClassName","NA").equals("") && jsonPeriod.getString("NAME").equals("P5")){
+                    String p5Name = sp.getString("p5ClassName", "NA");
+                    period.setPeriodName(p5Name);
+                }
+
+                else if (!sp.getString("p6ClassName","NA").equals("NA") && !sp.getString("p6ClassName","NA").equals("") && jsonPeriod.getString("NAME").equals("P6")){
+                    String p6Name = sp.getString("p6ClassName", "NA");
+                    period.setPeriodName(p6Name);
+                }
+
+                else if (!sp.getString("p7ClassName","NA").equals("NA") && !sp.getString("p7ClassName","NA").equals("") && jsonPeriod.getString("NAME").equals("P7")){
+                    String p7Name = sp.getString("p7ClassName", "NA");
+                    period.setPeriodName(p7Name);
+                }
+
+                else if (!sp.getString("p8ClassName","NA").equals("NA") && !sp.getString("p8ClassName","NA").equals("") && jsonPeriod.getString("NAME").equals("P8")){
+                    String p8Name = sp.getString("p8ClassName", "NA");
+                    period.setPeriodName(p8Name);
+                }
+
+                else{
+                    period.setPeriodName(jsonPeriod.getString("NAME"));
+                }
+
+                period.setPeriodStart(jsonPeriod.getString("START"));
+                period.setPeriodEnd(jsonPeriod.getString("END"));
+
+                periods[i]=period;
+
+                //
 
             }
         }
@@ -967,4 +1003,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    // This method gets called when an item in the drawer (settings) gets selected.
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+        if (id == R.id.period_settings) {
+            Intent i = new Intent(this, MyPreferencesActivity.class);
+            startActivity(i);
+        }
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+
+    }
 }
