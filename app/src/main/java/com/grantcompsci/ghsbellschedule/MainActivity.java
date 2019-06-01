@@ -958,8 +958,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 periods[i]=period;
 
-                //
-
             }
         }
 
