@@ -392,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             2) If the DATE/VERSION on the server are greater than the one we've got in SharedPrefs we download the SchedulePeriod data and store it in shared Prefs
 
              AB Calendar grabbed from here: https://calendar.google.com/calendar/embed?src=u2r5154prrjr5uhukp71857g70%40group.calendar.google.com&ctz=America/Los_Angeles%22
-             2017-18 Calendar grabbed from here: https://www.pps.net/site/handlers/icalfeed.ashx?MIID=13161
+                 2017-18 Calendar grabbed from here: https://www.pps.net/site/handlers/icalfeed.ashx?MIID=13161
              used ical2json app to convert the ical (ics) file to a JSON file (syntax: ical2json calendarName.ics)
 
          */
@@ -754,6 +754,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     || calendarScheduleDayObject.getString("SUMMARY").equals("A-PSAT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-PSAT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("PSAT")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-SAT")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-SAT")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("SAT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("A-EARLY DISMISSAL")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-EARLY DISMISSAL")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("EARLY DISMISSAL")
@@ -890,7 +893,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 "A-LATE START","B-LATE START","A-EARLY DISMISSAL", "B-EARLY DISMISSAL", "ACT","A-ACT","B-ACT","A-PSAT","B-PSAT","PSAT","FINALS-1","FINALS-2","FINALS-3",
                 "SPECIAL", "SPECIAL-1","SPECIAL-2", "SPECIAL-3","A-SPECIAL-1","A-SPECIAL-2","A-SPECIAL-3","B-SPECIAL-1","B-SPECIAL-2","B-SPECIAL-3",
                 "SKINNY", "ALL PERIODS", "LATE START", "EARLY DISMISSAL","A-FLEX-ASSEMBLY","B-FLEX-ASSEMBLY","ASSEMBLY","A-ASSEMBLY", "FIRST DAY",
-                "LAST DAY", "B-ASSEMBLY", "A-FLEX-LATE START", "B-FLEX-LATE START"};
+                "LAST DAY", "B-ASSEMBLY", "A-FLEX-LATE START", "B-FLEX-LATE START", "SAT", "A-SAT", "B-SAT"};
         JSONObject periodBells = new JSONObject(jsonData);
         boolean foundScheduleName = false;
         for (int i = 0; i < scheduleNames.length ; i++) {
