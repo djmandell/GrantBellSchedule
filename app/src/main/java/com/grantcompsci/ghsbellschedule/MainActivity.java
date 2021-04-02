@@ -751,6 +751,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-RACEFORWARD")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-RACEFORWARD-2")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-RACEFORWARD-3")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("RACEFORWARD")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("RACEFORWARD-1")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("RACEFORWARD-2")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("RACEFORWARD-3")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("RACEFORWARD-4")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("A-PSAT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-PSAT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("PSAT")
@@ -759,6 +764,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     || calendarScheduleDayObject.getString("SUMMARY").equals("SAT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("A-EARLY DISMISSAL")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-EARLY DISMISSAL")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-FLEX-EARLY DISMISSAL")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-FLEX-EARLY DISMISSAL")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("EARLY DISMISSAL")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("A-LATE START")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-LATE START")
@@ -768,14 +775,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     || calendarScheduleDayObject.getString("SUMMARY").equals("FINALS-1")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("FINALS-2")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("FINALS-3")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("FINALS-4")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("ALL PERIODS")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("SPECIAL")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("SPECIAL-1")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("SPECIAL-2")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("SPECIAL-3")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("SPECIAL-4")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("A-SPECIAL-1")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("A-SPECIAL-2")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("A-SPECIAL-3")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("A-SPECIAL-4")
+                    || calendarScheduleDayObject.getString("SUMMARY").equals("B-SPECIAL-4")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-SPECIAL-1")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-SPECIAL-2")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-SPECIAL-3")){
@@ -887,13 +898,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
          * Edit scheduleNames to match whatever schedule types you have in your calendar.  Anything not in scheduleNames will be considered "NO SCHOOL"
          * I've added a bunch of "SPECIAL" options so that I have flexibility in the case of one-off schedules without having to publish a new version of the app.
          *
+         * I really should just loop through the periodSchedule file to populate the scheduleNames array.  I wish I'd thought of that 5 years ago.
+         *
          */
 
-        String[] scheduleNames = {"A","B","A-FLEX","B-FLEX","A-RACEFORWARD","B-RACEFORWARD", "A-RACEFORWARD-2", "A-RACEFORWARD-3", "B-RACEFORWARD-2", "B-RACEFORWARD-3",
-                "A-LATE START","B-LATE START","A-EARLY DISMISSAL", "B-EARLY DISMISSAL", "ACT","A-ACT","B-ACT","A-PSAT","B-PSAT","PSAT","FINALS-1","FINALS-2","FINALS-3",
-                "SPECIAL", "SPECIAL-1","SPECIAL-2", "SPECIAL-3","A-SPECIAL-1","A-SPECIAL-2","A-SPECIAL-3","B-SPECIAL-1","B-SPECIAL-2","B-SPECIAL-3",
-                "SKINNY", "ALL PERIODS", "LATE START", "EARLY DISMISSAL","A-FLEX-ASSEMBLY","B-FLEX-ASSEMBLY","ASSEMBLY","A-ASSEMBLY", "FIRST DAY",
-                "LAST DAY", "B-ASSEMBLY", "A-FLEX-LATE START", "B-FLEX-LATE START", "SAT", "A-SAT", "B-SAT"};
+        String[] scheduleNames = {"A","B","C","A-FLEX","B-FLEX","C-FLEX","A-RACEFORWARD","B-RACEFORWARD", "A-RACEFORWARD-2", "A-RACEFORWARD-3", "B-RACEFORWARD-2", "B-RACEFORWARD-3",
+                "A-LATE START","B-LATE START","A-EARLY DISMISSAL", "B-EARLY DISMISSAL", "ACT","A-ACT","B-ACT","A-PSAT","B-PSAT","PSAT","FINALS-1","FINALS-2","FINALS-3","FINALS-4",
+                "SPECIAL", "SPECIAL-1","SPECIAL-2", "SPECIAL-3","SPECIAL-4","A-SPECIAL-1","A-SPECIAL-2","A-SPECIAL-3","A-SPECIAL-4","B-SPECIAL-1","B-SPECIAL-2","B-SPECIAL-3","B-SPECIAL-4",
+                "SKINNY", "ALL PERIODS", "LATE START", "EARLY DISMISSAL","A-FLEX-ASSEMBLY","B-FLEX-ASSEMBLY","ASSEMBLY","A-ASSEMBLY", "FIRST DAY","ASYNC", "A-RACEFORWARD-4","B-RACEFORWARD-4",
+                "LAST DAY", "B-ASSEMBLY", "A-FLEX-LATE START", "B-FLEX-LATE START", "SAT", "A-SAT", "B-SAT","WHITE","BLUE","GRAY","WEDNESDAY","TUESDAY","MONDAY","THURSDAY","FRIDAY",
+                "A-FLEX-EARLY DISMISSAL", "B-FLEX-EARLY-DISMISSAL", "RACEFORWARD","RACEFORWARD-!","RACEFORWARD-2","RACEFORWARD-3","RACEFORWARD-4"};
         JSONObject periodBells = new JSONObject(jsonData);
         boolean foundScheduleName = false;
         for (int i = 0; i < scheduleNames.length ; i++) {
