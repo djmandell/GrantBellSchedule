@@ -7,31 +7,29 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
+
 import android.view.Display;
 import android.view.MenuItem;
-import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import org.json.JSONArray;
@@ -42,6 +40,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
 import hirondelle.date4j.DateTime;
@@ -902,13 +901,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
          *
          */
 
-        String[] scheduleNames = {"A","B","C","A-FLEX","B-FLEX","C-FLEX","A-RACEFORWARD","B-RACEFORWARD", "A-RACEFORWARD-2", "A-RACEFORWARD-3", "B-RACEFORWARD-2", "B-RACEFORWARD-3",
+/*        String[] scheduleNames = {"A","B","C","A-FLEX","B-FLEX","C-FLEX","A-RACEFORWARD","B-RACEFORWARD", "A-RACEFORWARD-2", "A-RACEFORWARD-3", "B-RACEFORWARD-2", "B-RACEFORWARD-3",
                 "A-LATE START","B-LATE START","A-EARLY DISMISSAL", "B-EARLY DISMISSAL", "ACT","A-ACT","B-ACT","A-PSAT","B-PSAT","PSAT","FINALS-1","FINALS-2","FINALS-3","FINALS-4",
                 "SPECIAL", "SPECIAL-1","SPECIAL-2", "SPECIAL-3","SPECIAL-4","A-SPECIAL-1","A-SPECIAL-2","A-SPECIAL-3","A-SPECIAL-4","B-SPECIAL-1","B-SPECIAL-2","B-SPECIAL-3","B-SPECIAL-4",
                 "SKINNY", "ALL PERIODS", "LATE START", "EARLY DISMISSAL","A-FLEX-ASSEMBLY","B-FLEX-ASSEMBLY","ASSEMBLY","A-ASSEMBLY", "FIRST DAY","ASYNC", "A-RACEFORWARD-4","B-RACEFORWARD-4",
                 "LAST DAY", "B-ASSEMBLY", "A-FLEX-LATE START", "B-FLEX-LATE START", "SAT", "A-SAT", "B-SAT","WHITE","BLUE","GRAY","WEDNESDAY","TUESDAY","MONDAY","THURSDAY","FRIDAY",
-                "A-FLEX-EARLY DISMISSAL", "B-FLEX-EARLY-DISMISSAL", "RACEFORWARD","RACEFORWARD-!","RACEFORWARD-2","RACEFORWARD-3","RACEFORWARD-4"};
+                "A-FLEX-EARLY DISMISSAL", "B-FLEX-EARLY-DISMISSAL", "RACEFORWARD","RACEFORWARD-!","RACEFORWARD-2","RACEFORWARD-3","RACEFORWARD-4"};*/
         JSONObject periodBells = new JSONObject(jsonData);
+
+        String[] scheduleNames = new String[periodBells.length()];
+        Iterator<?> keys = periodBells.keys();
+        int counter = 0;
+        while(keys.hasNext()){
+            scheduleNames[counter] = (String)keys.next();
+            counter++;
+        }
+
+
         boolean foundScheduleName = false;
         for (int i = 0; i < scheduleNames.length ; i++) {
             if (mScheduleType.getScheduleType().equals(scheduleNames[i])){

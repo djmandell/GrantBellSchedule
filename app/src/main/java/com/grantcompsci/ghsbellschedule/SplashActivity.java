@@ -2,7 +2,7 @@ package com.grantcompsci.ghsbellschedule;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Created by djmandell on 11/19/16.

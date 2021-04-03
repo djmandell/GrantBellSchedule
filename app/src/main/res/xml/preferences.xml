@@ -3,38 +3,38 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
 
-    <android.support.v7.preference.EditTextPreference android:title="Period 1 Class Name"
+    <androidx.preference.EditTextPreference android:title="Period 1 Class Name"
         android:layout="@layout/pref_layout"
         android:key="p1ClassName"
         android:summary="Enter your class name for period 1">
-    </android.support.v7.preference.EditTextPreference>
-    <android.support.v7.preference.EditTextPreference android:title="Period 2 Class Name"
+    </androidx.preference.EditTextPreference>
+    <androidx.preference.EditTextPreference android:title="Period 2 Class Name"
         android:layout="@layout/pref_layout"
         android:key="p2ClassName"
-        android:summary="Enter your class name for period 2"></android.support.v7.preference.EditTextPreference>
-    <android.support.v7.preference.EditTextPreference android:title="Period 3 Class Name"
+        android:summary="Enter your class name for period 2"></androidx.preference.EditTextPreference>
+    <androidx.preference.EditTextPreference android:title="Period 3 Class Name"
         android:layout="@layout/pref_layout"
         android:key="p3ClassName"
-        android:summary="Enter your class name for period 3"></android.support.v7.preference.EditTextPreference>
-    <android.support.v7.preference.EditTextPreference android:title="Period 4 Class Name"
+        android:summary="Enter your class name for period 3"></androidx.preference.EditTextPreference>
+    <androidx.preference.EditTextPreference android:title="Period 4 Class Name"
         android:layout="@layout/pref_layout"
         android:key="p4ClassName"
-        android:summary="Enter your class name for period 4"></android.support.v7.preference.EditTextPreference>
-    <android.support.v7.preference.EditTextPreference android:title="Period 5 Class Name"
+        android:summary="Enter your class name for period 4"></androidx.preference.EditTextPreference>
+    <androidx.preference.EditTextPreference android:title="Period 5 Class Name"
         android:layout="@layout/pref_layout"
         android:key="p5ClassName"
-        android:summary="Enter your class name for period 5"></android.support.v7.preference.EditTextPreference>
-    <android.support.v7.preference.EditTextPreference android:title="Period 6 Class Name"
+        android:summary="Enter your class name for period 5"></androidx.preference.EditTextPreference>
+    <androidx.preference.EditTextPreference android:title="Period 6 Class Name"
         android:layout="@layout/pref_layout"
         android:key="p6ClassName"
-        android:summary="Enter your class name for period 6"></android.support.v7.preference.EditTextPreference>
-    <android.support.v7.preference.EditTextPreference android:title="Period 7 Class Name"
+        android:summary="Enter your class name for period 6"></androidx.preference.EditTextPreference>
+    <androidx.preference.EditTextPreference android:title="Period 7 Class Name"
         android:layout="@layout/pref_layout"
         android:key="p7ClassName"
-        android:summary="Enter your class name for period 7"></android.support.v7.preference.EditTextPreference>
-    <android.support.v7.preference.EditTextPreference android:title="Period 8 Class Name"
+        android:summary="Enter your class name for period 7"></androidx.preference.EditTextPreference>
+    <androidx.preference.EditTextPreference android:title="Period 8 Class Name"
         android:layout="@layout/pref_layout"
         android:key="p8ClassName"
-        android:summary="Enter your class name for period 8"></android.support.v7.preference.EditTextPreference>
+        android:summary="Enter your class name for period 8"></androidx.preference.EditTextPreference>
 
 </PreferenceScreen>
