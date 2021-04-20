@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.navigation.NavigationView;
@@ -15,6 +17,8 @@ import androidx.core.view.ViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Build;
 import android.os.Bundle;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -588,7 +592,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (mSharedPreferences != null){
             mSharedPreferences = getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE);
             mEditor = mSharedPreferences.edit();
-            if (mSharedPreferences.getString(KEY_JSONSCHEDULEDATA,"")!="" ){
+            if (!mSharedPreferences.getString(KEY_JSONSCHEDULEDATA,"").equals("") ){
                 mCompactCalendarView.removeAllEvents();
                 String jsonData = mSharedPreferences.getString(KEY_JSONSCHEDULEDATA, "");
                 try {
@@ -597,7 +601,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     e.printStackTrace();
                 }
             }
-            if (mSharedPreferences.getString(KEY_JSONPERIODSCHEDULEDATA,"")!="" ){
+            if (!mSharedPreferences.getString(KEY_JSONPERIODSCHEDULEDATA,"").equals("") ){
                 String periodScheduleData = mSharedPreferences.getString(KEY_JSONPERIODSCHEDULEDATA, "");
                 try {
                     mPeriods = getPeriodSchedule(periodScheduleData);
@@ -671,7 +675,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     //mRecyclerView.setNestedScrollingEnabled(false);
 
-                    // the Custom divider works great.  Built-in divider expanded for some reason.  Probalby a bug but didn't want to look at it.
+                    // the Custom divider works great.  Built-in divider expanded for some reason.  Probably a bug but didn't want to look at it.
                     mRecyclerView.addItemDecoration(new CustomDividerItemDecoration(mRecyclerView.getContext()));
                     mRecyclerView.setAdapter(adapter);
                     mRecyclerView.setLayoutManager(layoutManager);
@@ -906,9 +910,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 "SPECIAL", "SPECIAL-1","SPECIAL-2", "SPECIAL-3","SPECIAL-4","A-SPECIAL-1","A-SPECIAL-2","A-SPECIAL-3","A-SPECIAL-4","B-SPECIAL-1","B-SPECIAL-2","B-SPECIAL-3","B-SPECIAL-4",
                 "SKINNY", "ALL PERIODS", "LATE START", "EARLY DISMISSAL","A-FLEX-ASSEMBLY","B-FLEX-ASSEMBLY","ASSEMBLY","A-ASSEMBLY", "FIRST DAY","ASYNC", "A-RACEFORWARD-4","B-RACEFORWARD-4",
                 "LAST DAY", "B-ASSEMBLY", "A-FLEX-LATE START", "B-FLEX-LATE START", "SAT", "A-SAT", "B-SAT","WHITE","BLUE","GRAY","WEDNESDAY","TUESDAY","MONDAY","THURSDAY","FRIDAY",
-                "A-FLEX-EARLY DISMISSAL", "B-FLEX-EARLY-DISMISSAL", "RACEFORWARD","RACEFORWARD-!","RACEFORWARD-2","RACEFORWARD-3","RACEFORWARD-4"};*/
+                "A-FLEX-EARLY DISMISSAL", "B-FLEX-EARLY-DISMISSAL", "RACEFORWARD","RACEFORWARD-1","RACEFORWARD-2","RACEFORWARD-3","RACEFORWARD-4"};*/
         JSONObject periodBells = new JSONObject(jsonData);
 
+        // Loop through all of the schedule types defined in periodSchedule.json and store them in an array
         String[] scheduleNames = new String[periodBells.length()];
         Iterator<?> keys = periodBells.keys();
         int counter = 0;
@@ -917,10 +922,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             counter++;
         }
 
-
         boolean foundScheduleName = false;
         for (int i = 0; i < scheduleNames.length ; i++) {
-            if (mScheduleType.getScheduleType().equals(scheduleNames[i])){
+            // If today's schedule type exists in periodSchedule.json and the type isn't "NO SCHOOL" then set foundSchedule to true so that we use it to create today's schedule
+            // NO SCHOOL exists periodSchedule.json because the iPhone app crashed without it.  I'm not using it here.
+            if (mScheduleType.getScheduleType().equals(scheduleNames[i]) && !scheduleNames[i].equals("NO SCHOOL")){
                 foundScheduleName=true;
             }
         }
@@ -1016,13 +1022,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // Check for internet connection before we try to get today's schedule
     private boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
         boolean isAvailable=false;
+        // NetworkInfo has been deprectated in API 29
+/*        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+
         //Log.d("GRRRR",networkInfo.isConnectedOrConnecting() + " connecting?: " + networkInfo.isConnected() + " is connected");
         if (networkInfo !=null && networkInfo.isConnected()){
             isAvailable = true;
         }
 
+        ;*/
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Network nw = manager.getActiveNetwork();
+            if (nw == null) return false;
+            NetworkCapabilities actNw = manager.getNetworkCapabilities(nw);
+            if (actNw != null && (actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH))){
+                isAvailable = true;
+            }
+        } else {
+            NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+            if (networkInfo !=null && networkInfo.isConnected()){
+                isAvailable = true;
+            }
+        }
         return isAvailable;
 
     }
