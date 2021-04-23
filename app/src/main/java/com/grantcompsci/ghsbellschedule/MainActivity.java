@@ -739,7 +739,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
 
             // if there's an unusual schedule type (ACT, PSAT, RACEFORWARD, FINALS, EARLY DISMISSAL, LATE START, SPECIAL, etc)
-            // draw a green circle around the date in the date picker
+            // draw a green circle around the date in the date picker.  Makes it easier for students to see something weird is coming.
             if (calendarScheduleDayObject.getString("SUMMARY").equals("A-ACT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-ACT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("ACT")
