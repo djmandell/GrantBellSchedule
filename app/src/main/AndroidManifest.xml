@@ -13,13 +13,14 @@
         android:theme="@style/AppTheme.NoActionBar">
         <activity
             android:name="com.grantcompsci.ghsbellschedule.SplashActivity"
-            android:theme="@style/SplashTheme">
+            android:theme="@style/SplashTheme"
+            android:exported="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity android:name="com.grantcompsci.ghsbellschedule.MainActivity" android:launchMode="singleTop">
+        <activity android:name="com.grantcompsci.ghsbellschedule.MainActivity" android:launchMode="singleTop" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

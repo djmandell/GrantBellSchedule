@@ -418,12 +418,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         // mTodayDateInt (int) used to check to see if we've checked for schedule version updates today. If not, check for updates.
-        // currentTime (int) used to see if the time is before 8:30 or after 4:30, if it is
-        // we check for version updates even if we've checked already today (in case of weather-related late
-        // change)
+        // currentTime (int) used to see if the time is before 8:30 or after 4:00, if it is we check for version updates even if
+        // we've checked already today (in case of a last-minute weather-related change)
+        //
         // If today's schedule is a late start we check for schedule changes all day, just in case they change from late start to no school.
         // If we've never downloaded the schedule
         // The program also checks the version file every time the app is opened on a weekend, regardless of the time.
+        //
+        // I'm doing all of this to protect my server from getting slammed during school hours, when more people might simultaneously
+        // check the app.
         if (mScheduleType != null){
             //Log.i(TAG,"YOOOOOOOOO! " + mScheduleType.getScheduleType());
         }

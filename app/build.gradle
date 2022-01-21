@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId 'com.grantcompsci.ghsbellschedule'
         minSdkVersion 17
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 15
         versionName "1.5.4"
     }
@@ -28,7 +28,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'com.squareup.okio:okio:2.4.0'
-    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation 'com.squareup.okhttp3:okhttp:4.7.2'
     implementation 'com.darwinsys:hirondelle-date4j:1.5.1'
     implementation 'com.github.sundeepk:compact-calendar-view:3.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
