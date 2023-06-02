@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     defaultConfig {
         applicationId 'com.grantcompsci.ghsbellschedule'
         minSdkVersion 17
-        targetSdkVersion 31
-        versionCode 15
-        versionName "1.5.4"
+        targetSdkVersion 33
+        versionCode 16
+        versionName "1.5.5"
     }
     buildTypes {
         release {

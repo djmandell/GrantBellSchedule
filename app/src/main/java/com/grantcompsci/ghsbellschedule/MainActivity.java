@@ -743,6 +743,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             // if there's an unusual schedule type (ACT, PSAT, RACEFORWARD, FINALS, EARLY DISMISSAL, LATE START, SPECIAL, etc)
             // draw a green circle around the date in the date picker.  Makes it easier for students to see something weird is coming.
+
+
+            String[] unusualSchedules = {"A-ACT","B-ACT","ACT","A-ASSEMBLY","B-ASSEMBLY","ASSEMBLY","A-FLEX-ASSEMBLY","B-FLEX-ASSEMBLY","FIRST DAY","LAST DAY",
+                    "A-RACEFORWARD","B-RACEFORWARD", "A-RACEFORWARD-2", "A-RACEFORWARD-3","A-RACEFORWARD-4","B-RACEFORWARD-2", "B-RACEFORWARD-3", "B-RACEFORWARD-4",
+                    "A-LATE START","B-LATE START", "A-EARLY DISMISSAL", "B-EARLY DISMISSAL", "ACT","A-ACT","B-ACT","A-PSAT","B-PSAT","PSAT","FINALS-1","FINALS-2",
+                    "FINALS-3","FINALS-4", "SPECIAL","SPECIAL-1","SPECIAL-2", "SPECIAL-3","SPECIAL-4","A-SPECIAL-1","A-SPECIAL-2","A-SPECIAL-3","A-SPECIAL-4",
+                    "B-SPECIAL-1","B-SPECIAL-2","B-SPECIAL-3","B-SPECIAL-4","A-FLEX-LATE START", "B-FLEX-LATE START", "SAT", "A-SAT", "B-SAT","LATE START",
+                    "RACEFORWARD","RACEFORWARD-1","RACEFORWARD-2","RACEFORWARD-3","RACEFORWARD-4","A-FLEX-EARLY DISMISSAL","B-FLEX-EARLY DISMISSAL","EARLY DISMISSAL",
+                    "ALL PERIODS", "SEL"};
+
+            // LOOP THROUGH ALL OUR "SPECIAL" SCHEDULE TYPES, RATHER THAN MASSIVE IF.  SHOULD HAVE DONE THIS YEARS AGO
+            // NOT TEST YET, SO COMMENTED OUT UNTIL I GET AROUND TO MAKING SURE IT DOESN'T BREAK SHIT
+
+/*
+            for (int j = 0; j < unusualSchedules.length; j++) {
+                if (calendarScheduleDayObject.getString("SUMMARY").equals(j)){
+                    Date eventDate = new Date();
+                    String eventDateString = calendarScheduleDayObject.getString("DTSTART;VALUE=DATE");
+                    try {
+                        eventDate = new SimpleDateFormat("yyyyMMdd").parse(eventDateString);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    mCompactCalendarView.addEvent(new Event(Color.parseColor("#46f900"),eventDate.getTime()), true);
+                }
+            }
+*/
+
             if (calendarScheduleDayObject.getString("SUMMARY").equals("A-ACT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("B-ACT")
                     || calendarScheduleDayObject.getString("SUMMARY").equals("ACT")
